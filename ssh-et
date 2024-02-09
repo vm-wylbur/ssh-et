@@ -141,10 +141,16 @@ main() {
     -oHostKeyAlias="${remote}" "${remote}"
   )
   _log_info "Running: ${ssh_cmd[*]}"
-  "${ssh_cmd[@]}"
+  if [[ ! -z "$TMUX" ]]; then
+      tmux rename-window "$(echo ${remote} | awk '{print $NF}')"
+      "${ssh_cmd[@]}"
+      tmux rename-window "$(hostname -s)"
+  else
+    "${ssh_cmd[@]}"
+  fi
   kill "${et_pid}"
-  # wait "${et_pid}"
   rm -rf -- "${tmpdir}"
 }
 
 main "$@"
+
